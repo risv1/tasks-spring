@@ -10,9 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users")
+@Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class TaskEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,14 +21,17 @@ public class User {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "email", nullable = false)
-    private String email;
+    @Column(name = "description", nullable = false)
+    private String description;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(name = "assignee", nullable = false)
+    private String assignee;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "due_date", nullable = false)
+    private String dueDate;
 
     @Column(name = "created_at", nullable = false)
     private String createdAt;

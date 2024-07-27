@@ -2,7 +2,6 @@ package com.example.api.auth;
 
 public class AuthModel {
 
-    public String id;
     public String username;
     public String email;
     public String password;
@@ -11,7 +10,7 @@ public class AuthModel {
     public String updatedAt;
 
     public AuthModel(
-            String id,
+
             String username,
             String email,
             String password,
