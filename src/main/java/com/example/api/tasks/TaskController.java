@@ -1,5 +1,6 @@
 package com.example.api.tasks;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,28 +25,41 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskModel>> getAllTasks(){
-        return ResponseEntity.ok(service.getTasks());
+    public ResponseEntity<TaskResponses> getAllTasks(){
+        List<TaskModel> tasks = service.getTasks();
+        if (tasks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new TaskResponses(tasks, "Tasks retrieved"));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskModel> getTaskById(@PathVariable("id") String id){
-        return ResponseEntity.ok(TaskService.getTaskById(id));
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable("id") UUID id){
+        return ResponseEntity.ok(new TaskResponse(service.getTaskById(id), "Task retrieved"));
+    }
+
+    @GetMapping("/assignee/{assignee}")
+    public ResponseEntity<TaskResponses> getTasksByAssignee(@PathVariable("assignee") String assignee){
+        List<TaskModel> tasks = service.getTasksByAssignee(assignee);
+        if (tasks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new TaskResponses(tasks, "Tasks retrieved"));
     }
 
     @PostMapping
-    public ResponseEntity<TaskModel> createTask(TaskModel task){
-        return ResponseEntity.ok(service.createTask(task));
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskModel task){
+        return ResponseEntity.ok(new TaskResponse(service.createTask(task), "Task created"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskModel> updateTask(@PathVariable("id") String id, TaskModel task){
-        return ResponseEntity.ok(service.updateTask(id, task));
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable("id") UUID id, @RequestBody TaskModel task){
+        return ResponseEntity.ok(new TaskResponse(service.updateTask(id, task), "Task updated"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskModel> deleteTask(@PathVariable("id") String id){
-        return ResponseEntity.ok(service.deleteTask(id));
+    public ResponseEntity<TaskResponse> deleteTask(@PathVariable("id") UUID id){
+        return ResponseEntity.ok(new TaskResponse(service.deleteTask(id), "Task deleted"));
     }
     
 }

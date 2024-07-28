@@ -1,50 +1,54 @@
 package com.example.api.users;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.database.UserEntity;
 
 @Service
 public class UserService {
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<UserModel> getUsers() {
-        return List.of(new UserModel(null, null, null, null, null, null, null));
+        List<UserEntity> allUsers = userRepository.findAll();
+        return UserModel.fromEntityList(allUsers);
     }
 
-    public UserModel getUserById(String id) {
-        return new UserModel(
-                id,
-                "User 1",
-                "user1@gmail.com",
-                "password",
-                "User",
-                "2021-01-01",
-                "2021-01-01");
-    }
-    
-    public UserModel createUser(UserModel user) {
-        return new UserModel(
-                "1",
-                user.username,
-                user.email,
-                user.password,
-                user.role,
-                "2021-01-01",
-                "2021-01-01");
+    public UserModel getUserById(UUID id) {
+        UserEntity user = userRepository.findById(id).orElse(null);
+        return UserModel.fromEntity(user);
     }
 
-    public UserModel updateUser(String id, UserModel user) {
-        return new UserModel(
-                id,
-                user.username,
-                user.email,
-                user.password,
-                user.role,
-                "2021-01-01",
-                "2021-01-01");
+
+    public UserModel updateUser(UUID id, UserModel user) {
+        UserEntity userToUpdate = userRepository.findById(id).orElse(null);
+        if (userToUpdate == null) {
+            return null;
+        }
+
+        if (user.role != null) {
+            userToUpdate.setRole(user.role);
+        }
+        userToUpdate.setUpdatedAt(LocalDate.now().toString());
+
+        userRepository.save(userToUpdate);
+
+        return UserModel.fromEntity(userToUpdate);
     }
 
-    public String deleteUser(String id) {
-        return "User deleted";
+    public UserModel deleteUser(UUID id) {
+        UserEntity userToDelete = userRepository.findById(id).orElse(null);
+        if (userToDelete == null) {
+            return null;
+        }
+
+        userRepository.delete(userToDelete);
+
+        return UserModel.fromEntity(userToDelete);
     }
 }

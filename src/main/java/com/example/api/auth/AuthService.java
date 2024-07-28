@@ -2,8 +2,6 @@ package com.example.api.auth;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.UUID;
-
 import com.example.api.utils.HashUtils;
 import com.example.api.utils.JwtUtils;
 import com.example.database.UserEntity;

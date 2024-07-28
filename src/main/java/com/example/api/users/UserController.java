@@ -1,13 +1,13 @@
 package com.example.api.users;
 
+import java.util.UUID;
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,27 +22,38 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserModel>> getUsers() {
-        return ResponseEntity.ok(service.getUsers());
+    public ResponseEntity<UserResponses> getUsers() {
+        List<UserModel> users = service.getUsers();
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new UserResponses(users, "Users retrieved"));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserModel> getUserById(@PathVariable("id") String id) {
-        return ResponseEntity.ok(service.getUserById(id));
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<UserModel> createUser(UserModel user) {
-        return ResponseEntity.ok(service.createUser(user));
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("id") UUID id) {
+        UserModel user = service.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new UserResponse(user, "User retrieved"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserModel> updateUser(@PathVariable("id") String id, UserModel user) {
-        return ResponseEntity.ok(service.updateUser(id, user));
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("id") UUID id, @RequestBody UserModel user) {
+        UserModel updatedUser = service.updateUser(id, user);
+        if (updatedUser == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new UserResponse(updatedUser, "User updated"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") String id) {
-        return ResponseEntity.ok(service.deleteUser(id));
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable("id") UUID id) {
+        UserModel deletedUser = service.deleteUser(id);
+        if (deletedUser == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(new UserResponse(deletedUser, "User deleted"));
     }
 }

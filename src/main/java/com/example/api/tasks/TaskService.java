@@ -1,82 +1,84 @@
 package com.example.api.tasks;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.database.TaskEntity;
 
 @Service
 public class TaskService {
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     public List<TaskModel> getTasks() {
-        TaskModel task1 = new TaskModel(
-                "1",
-                "Task 1",
-                "Description 1",
-                "Pending",
-                "123",
-                "2021-01-01",
-                "2021-01-01",
-                "2021-01-01");
-
-        TaskModel task2 = new TaskModel(null, null, null, null, null, null, null, null);
-        
-        List<TaskModel> tasks = List.of(task1, task2);
-
-        return tasks;
+        List<TaskEntity> allTasks = taskRepository.findAll();
+        return TaskModel.fromEntityList(allTasks);
     }
 
-    public static TaskModel getTaskById(String id) {
-        TaskModel task = new TaskModel(
-                id,
-                "Task 1",
-                "Description 1",
-                "Pending",
-                "123",
-                "2021-01-01",
-                "2021-01-01",
-                "2021-01-01");
-
-        return task;
+    public TaskModel getTaskById(UUID id) {
+        TaskEntity task = taskRepository.findById(id).orElse(null);
+        return TaskModel.fromEntity(task);
     }
 
     public TaskModel createTask(TaskModel task) {
-        TaskModel newTask = new TaskModel(
-                "2",
+        TaskEntity newTask = new TaskEntity(
                 task.title,
                 task.description,
-                "123",
+                task.assignee,
                 "Pending",
                 task.dueDate,
-                "2021-01-01",
-                "2021-01-01");
-
-        return newTask;
+                LocalDate.now().toString(),
+                LocalDate.now().toString()
+        );
+        taskRepository.save(newTask);
+        return TaskModel.fromEntity(newTask);
     }
 
-    public TaskModel updateTask(String id, TaskModel task) {
-        TaskModel updatedTask = new TaskModel(
-                id,
-                task.title,
-                task.description,
-                task.status,
-                "123",
-                task.dueDate,
-                "2021-01-01",
-                "2021-01-01");
+    public TaskModel updateTask(UUID id, TaskModel task) {
+        TaskEntity taskToUpdate = taskRepository.findById(id).orElse(null);
+        if (taskToUpdate == null) {
+            return null;
+        }
 
-        return updatedTask;
+        if(task.title != null){
+            taskToUpdate.setTitle(task.title);
+        }
+        if(task.description != null){
+            taskToUpdate.setDescription(task.description);
+        }
+        if(task.assignee != null){
+            taskToUpdate.setAssignee(task.assignee);
+        }
+        if(task.status != null){
+            taskToUpdate.setStatus(task.status);
+        }
+        if(task.dueDate != null){
+            taskToUpdate.setDueDate(task.dueDate);
+        }
+        taskToUpdate.setUpdatedAt(LocalDate.now().toString());
+
+        taskRepository.save(taskToUpdate);
+
+        return TaskModel.fromEntity(taskToUpdate);
     }
 
-    public TaskModel deleteTask(String id) {
-        TaskModel task = new TaskModel(
-                id,
-                "Task 1",
-                "Description 1",
-                "Pending",
-                "123",
-                "2021-01-01",
-                "2021-01-01",
-                "2021-01-01");
+    public TaskModel deleteTask(UUID id) {
+       TaskEntity taskToDelete = taskRepository.findById(id).orElse(null);
+        if (taskToDelete == null) {
+            return null;
+        }
 
-        return task;
+        taskRepository.delete(taskToDelete);
+
+        return TaskModel.fromEntity(taskToDelete);
+    }
+
+    public List<TaskModel> getTasksByAssignee(String assignee) {
+        List<TaskEntity> tasks = taskRepository.findByAssignee(assignee);
+        return TaskModel.fromEntityList(tasks);
     }
 }

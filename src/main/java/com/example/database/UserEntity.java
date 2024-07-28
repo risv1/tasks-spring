@@ -53,4 +53,40 @@ public class UserEntity {
     @Column(name = "updated_at", nullable = false)
     public String updatedAt;
 
+    public String getId() {
+        return id.toString();
+    }
+
+    public String getUsername(){
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getUpdatedAt() {
+       return updatedAt;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
 }
