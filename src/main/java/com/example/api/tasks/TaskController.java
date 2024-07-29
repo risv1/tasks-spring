@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.middlewares.AdminMiddleware;
+
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -48,16 +50,25 @@ public class TaskController {
     }
 
     @PostMapping
+    @AdminMiddleware
     public ResponseEntity<TaskResponse> createTask(@RequestBody TaskModel task){
         return ResponseEntity.ok(new TaskResponse(service.createTask(task), "Task created"));
     }
 
     @PutMapping("/{id}")
+    @AdminMiddleware
     public ResponseEntity<TaskResponse> updateTask(@PathVariable("id") UUID id, @RequestBody TaskModel task){
         return ResponseEntity.ok(new TaskResponse(service.updateTask(id, task), "Task updated"));
     }
 
+    @PutMapping("/{id}/status")
+    @AdminMiddleware
+    public ResponseEntity<TaskResponse> updateTaskStatus(@PathVariable("id") UUID id){
+        return ResponseEntity.ok(new TaskResponse(service.markTaskComplete(id), "Task status updated"));
+    }
+
     @DeleteMapping("/{id}")
+    @AdminMiddleware
     public ResponseEntity<TaskResponse> deleteTask(@PathVariable("id") UUID id){
         return ResponseEntity.ok(new TaskResponse(service.deleteTask(id), "Task deleted"));
     }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.middlewares.AdminMiddleware;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -22,6 +24,7 @@ public class UserController {
     }
 
     @GetMapping
+    @AdminMiddleware
     public ResponseEntity<UserResponses> getUsers() {
         List<UserModel> users = service.getUsers();
         if (users.isEmpty()) {
@@ -31,6 +34,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @AdminMiddleware
     public ResponseEntity<UserResponse> getUserById(@PathVariable("id") UUID id) {
         UserModel user = service.getUserById(id);
         if (user == null) {
@@ -40,6 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @AdminMiddleware
     public ResponseEntity<UserResponse> updateUser(@PathVariable("id") UUID id, @RequestBody UserModel user) {
         UserModel updatedUser = service.updateUser(id, user);
         if (updatedUser == null) {
@@ -49,6 +54,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @AdminMiddleware
     public ResponseEntity<UserResponse> deleteUser(@PathVariable("id") UUID id) {
         UserModel deletedUser = service.deleteUser(id);
         if (deletedUser == null) {

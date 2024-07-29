@@ -81,4 +81,18 @@ public class TaskService {
         List<TaskEntity> tasks = taskRepository.findByAssignee(assignee);
         return TaskModel.fromEntityList(tasks);
     }
+
+    public TaskModel markTaskComplete(UUID id) {
+        TaskEntity task = taskRepository.findById(id).orElse(null);
+        if (task == null) {
+            return null;
+        }
+
+        task.setStatus("Completed");
+        task.setUpdatedAt(LocalDate.now().toString());
+
+        taskRepository.save(task);
+
+        return TaskModel.fromEntity(task);
+    }
 }
